@@ -23,10 +23,6 @@ The package is organized into clear subpackages:
   High-level wrappers for interacting with the PubChem PUG-REST API
   (search, property retrieval, robust HTTP access)
 
-- `cinf26pk.mod10`  
-  Module 10 (Supervised Machine Learning) helpers
-  (canonical filesystem paths, shared definitions)
-
 ---
 
 ## Installation (Editable Mode)
