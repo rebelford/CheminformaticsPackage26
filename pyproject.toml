@@ -20,5 +20,6 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/rebelford"
 
-[tool.setuptools]
-packages = ["cinf26pk"]
+[tool.setuptools.packages.find]
+where = ["."]
+

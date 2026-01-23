@@ -17,9 +17,7 @@ cinf26pk is organized into clear subpackages:
     High-level wrappers for interacting with the PubChem PUG-REST API
     (search, property retrieval, robust HTTP access)
 
-- mod10
-    Module 10 (Supervised Machine Learning) specific helpers
-    (canonical filesystem paths, shared definitions)
+
 
 Recommended usage
 -----------------
@@ -44,7 +42,7 @@ Design philosophy
 
 from . import core
 from . import pubchem
-from . import mod10
+
 
 # ============================================================
 # Exported names
@@ -53,5 +51,4 @@ from . import mod10
 __all__ = [
     "core",
     "pubchem",
-    "mod10",
 ]
