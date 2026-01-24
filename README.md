@@ -59,9 +59,16 @@ cheminformaticsPackage26
 conda activate cinf26
 ```
 #### If you are using a virtual environment (venv)
+Inside the repo directory 
+```bash
+python -m venv .venv
+```
+this creates a `cheminformaticsPackage26/.venv/` subdirectory, and then run
 ```bash
 source .venv/bin/activate
 ```
+you should see something like `(.venv) user@machine:CheminformaticsPackage26$`
+`
 ### Step 3: Install the package in editable mode
 ```bash
 pip install -e .
