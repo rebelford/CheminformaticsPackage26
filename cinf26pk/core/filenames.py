@@ -37,49 +37,62 @@ Typical usage
 # ============================================================
 # Imports
 # ============================================================
+"""
+cinf26pk.core.filenames
+
+Filename-generation utilities for CINF 26.
+"""
 
 from datetime import datetime
 from pathlib import Path
 
 
 # ============================================================
-# Filename helpers
+# Versioned exploratory artifacts
 # ============================================================
 
-def make_filename(prefix: str, ext: str = "csv") -> str:
+def make_filename(
+    prefix: str,
+    ext: str,
+    directory: Path
+) -> str:
     """
-    Create a versioned, date-stamped filename of the form:
+    Create a versioned, date-stamped filename:
 
         prefix_YYYYMMDD_vN.ext
 
-    Intended for exploratory or intermediate artifacts that may be
-    regenerated multiple times in a single day.
-
-    NOTE
-    ----
-    This function does NOT create directories and does NOT return
-    a path. Directory management is the responsibility of the caller.
-
-    Parameters
-    ----------
-    prefix : str
-        Filename prefix.
-    ext : str, default="csv"
-        File extension (without dot).
-
-    Returns
-    -------
-    str
-        Generated filename.
+    Version auto-increments based on existing files in directory.
     """
+
+    if not isinstance(directory, Path):
+        raise TypeError("directory must be a pathlib.Path object")
+
     date_str = datetime.now().strftime("%Y%m%d")
     base = f"{prefix}_{date_str}"
 
-    # Versioning is deferred to the caller's directory context.
-    # The caller should count existing files if versioning matters.
-    # By default, start with v1.
-    return f"{base}_v1.{ext}"
+    existing_versions = []
 
+    if directory.exists():
+        for f in directory.iterdir():
+            if f.is_file() and f.suffix == f".{ext}":
+                name = f.stem
+                if name.startswith(base):
+                    parts = name.split("_v")
+                    if len(parts) == 2 and parts[0] == base:
+                        try:
+                            version = int(parts[1])
+                            existing_versions.append(version)
+                        except ValueError:
+                            pass
+
+    next_version = max(existing_versions, default=0) + 1
+
+    return f"{base}_v{next_version}.{ext}"
+
+
+# ============================================================
+# Deterministic canonical artifacts
+# ============================================================
 
 def make_fixed_filename(
     stem: str,
@@ -87,27 +100,11 @@ def make_fixed_filename(
     add_date: bool = True
 ) -> str:
     """
-    Create a deterministic filename of the form:
+    Create deterministic filename:
 
         stem[_YYYYMMDD].ext
-
-    Intended for canonical or authoritative artifacts that should
-    not be auto-versioned.
-
-    Parameters
-    ----------
-    stem : str
-        Base filename (without extension).
-    ext : str, default="csv"
-        File extension (without dot).
-    add_date : bool, default=True
-        Append YYYYMMDD to the filename.
-
-    Returns
-    -------
-    str
-        Generated filename.
     """
+
     if add_date:
         date_str = datetime.now().strftime("%Y%m%d")
         return f"{stem}_{date_str}.{ext}"
@@ -115,52 +112,26 @@ def make_fixed_filename(
         return f"{stem}.{ext}"
 
 
+# ============================================================
+# Identity-based model artifacts
+# ============================================================
+
 def make_artifact_filename(
     stem: str,
     ext: str,
     version: str | None = None
 ) -> str:
     """
-    Create an identity-based filename for models or pipeline artifacts.
+    Create identity-based artifact filename:
 
-    Examples
-    --------
-    nb_maccs_AID743139.joblib
-    nb_maccs_AID743139_v1.joblib
-    rf_ecfp4_AID743139_v2.joblib
-
-    Intended for trained models, pipelines, or evaluation artifacts
-    where versioning is intentional and meaningful.
-
-    NOTE
-    ----
-    This function is introduced for Module 10.4 and later.
-    It is NOT used in Module 10.2.
-
-    Parameters
-    ----------
-    stem : str
-        Base artifact name (without extension).
-    ext : str
-        File extension (without dot).
-    version : str or None, optional
-        Explicit version tag (e.g., "v1", "v2"). If None, no version
-        suffix is added.
-
-    Returns
-    -------
-    str
-        Generated filename.
+        stem[_version].ext
     """
+
     if version:
         return f"{stem}_{version}.{ext}"
     else:
         return f"{stem}.{ext}"
 
-
-# ============================================================
-# Public API
-# ============================================================
 
 __all__ = [
     "make_filename",
